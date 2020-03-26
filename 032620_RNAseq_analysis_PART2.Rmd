@@ -1,0 +1,218 @@
+---
+title: "032620_RNAseq_analysis_PART2"
+output: 
+  html_document:
+    keep_md: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = FALSE, message = FALSE)
+```
+
+
+## Purpose
+
+The goal of this section is to perform pathway enrichment analysis using ReactomePA for Card9-dependent and Card9-independent Dectin-1 regulated genes (identified in PART1). In addition, this section generates heatmaps for selected differentially expressed genes in pathways of interest.
+
+
+```{r library, results='hide'}
+library(DOSE)
+library(ReactomePA)
+library(clusterProfiler)
+library(org.Mm.eg.db)
+library(ggplot2)
+library(pheatmap)
+library(dplyr)
+```
+
+## 1. Format data for pathway enrichment analysis
+
+```{r}
+#Use df for Card9 dependent (Card9_dep) and Card9 independent (Card9_ind) generated in PART1
+load(file = "Card9_dep.Rdata")
+load(file = "Card9_ind.Rdata")
+
+dim(Card9_dep)
+dim(Card9_ind)
+
+#Subset to only upregulated genes
+Card9_dep_up <- subset(Card9_dep, Card9_dep[,"logFC (WT-Neutrophil-curdlan / WT-Neutrophil-unstimulated)"] > 0)
+Card9_ind_up <- subset(Card9_ind, Card9_ind[,"logFC (WT-Neutrophil-curdlan / WT-Neutrophil-unstimulated)"] > 0)
+
+#344 upregulated Card9-dep genes
+dim(Card9_dep_up)
+
+#413 upregulated Card9-ind genes
+dim(Card9_ind_up)
+
+#Convert gene name to Entrez ID, manually annotate genes which didn't match
+#bitr(geneID, fromType, toType, OrgDb, drop = TRUE)
+nonsig.df <- bitr(Card9_ind_up$GeneName, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Mm.eg.db, drop = FALSE)
+sig.df <- bitr(Card9_dep_up$GeneName, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Mm.eg.db, drop = FALSE)
+
+```
+
+## 2. Proceed with ReactomePA analysis
+
+### Card9-independent genes
+
+```{r}
+nonsig.df_list <- as.vector(nonsig.df$ENTREZID)
+Card9nonsig <- enrichPathway(gene = nonsig.df_list, organism = "mouse", pvalueCutoff=0.05, readable=T)
+head(as.data.frame(Card9nonsig))
+class(Card9nonsig)
+barplot(Card9nonsig, showCategory = 20)
+emapplot(Card9nonsig)
+cnetplot(Card9nonsig, showCategory = 20, node_label = FALSE, colorEdge = TRUE)
+#write.csv(Card9nonsig, "Card9nonsig.csv")
+```
+
+### Card9-dependent genes
+
+```{r}
+sig.df_list <- as.vector(sig.df$ENTREZID)
+Card9sig <- enrichPathway(gene = sig.df_list, organism = "mouse", pvalueCutoff=0.05, readable=T)
+head(as.data.frame(Card9sig))
+class(Card9sig)
+barplot(Card9sig, showCategory = 20)
+emapplot(Card9sig)
+cnetplot(Card9sig, showCategory = 20, node_label = FALSE, colorEdge = TRUE)
+#write.csv(Card9sig, "Card9sig.csv")
+```
+
+
+## 3. Generate heatmaps
+
+
+### Card9-independent 
+
+```{r}
+#Creating DF with only the expression values and with the gene names as the rownames
+Card9ind_hm <- Card9_ind_up
+Card9ind_hm$uGeneName <- make.names(Card9ind_hm$GeneName, unique=TRUE)
+rownames(Card9ind_hm) <- Card9ind_hm$uGeneName
+Card9ind_hm <- Card9ind_hm[, c(3:14)]
+
+#Generating gene lists of interest based on pathways
+Genelist_1 <- c("Osm", "Lif", "Csf1", "Il1r2", "Tollip", "Nfkbib")
+Genelist_2 <- c("Ctsz", "Vamp2", "Gns", "M6pr", "Cltc")
+Genelist_3 <- c("Ptges3", "Hif1a", "Hyou1", "Prdx6", "Prdx1")
+Genelist_4 <- c("Pfkp", "Pfkl", "Tpi1")
+Genelist_5 <- c("Cd93", "Vegfa", "Raf1", "Sgpl1")
+
+#Generating df subsets
+Card9ind_hm_1 <- subset(Card9ind_hm, rownames(Card9ind_hm) %in% Genelist_1)
+Card9ind_hm_2 <- subset(Card9ind_hm, rownames(Card9ind_hm) %in% Genelist_2)
+Card9ind_hm_3 <- subset(Card9ind_hm, rownames(Card9ind_hm) %in% Genelist_3)
+Card9ind_hm_4 <- subset(Card9ind_hm, rownames(Card9ind_hm) %in% Genelist_4)
+Card9ind_hm_5 <- subset(Card9ind_hm, rownames(Card9ind_hm) %in% Genelist_5)
+
+#Generating hm
+pheatmap(Card9ind_hm_1, scale = "row", cluster_rows = FALSE, cluster_cols = FALSE, clustering_distance_rows = "correlation", 
+	         cutree_rows = 1, 
+	         cellwidth = 8, 
+	         cellheight = 10, 
+	         fontsize = 10, 
+	         show_colnames = FALSE, show_rownames = TRUE, fontsize_row = 8, 
+	         legend = TRUE, legend_breaks = c(-2,0,2))
+
+pheatmap(Card9ind_hm_2, scale = "row", cluster_rows = FALSE, cluster_cols = FALSE, clustering_distance_rows = "correlation", 
+	         cutree_rows = 1, 
+	         cellwidth = 8, 
+	         cellheight = 10, 
+	         fontsize = 10, 
+	         show_colnames = FALSE, show_rownames = TRUE, fontsize_row = 8, 
+	         legend = TRUE, legend_breaks = c(-2,0,2))
+
+pheatmap(Card9ind_hm_3, scale = "row", cluster_rows = FALSE, cluster_cols = FALSE, clustering_distance_rows = "correlation", 
+	         cutree_rows = 1, 
+	         cellwidth = 8, 
+	         cellheight = 10, 
+	         fontsize = 10, 
+	         show_colnames = FALSE, show_rownames = TRUE, fontsize_row = 8, 
+	         legend = TRUE, legend_breaks = c(-2,0,2))
+
+pheatmap(Card9ind_hm_4, scale = "row", cluster_rows = FALSE, cluster_cols = FALSE, clustering_distance_rows = "correlation", 
+	         cutree_rows = 1, 
+	         cellwidth = 8, 
+	         cellheight = 10, 
+	         fontsize = 10, 
+	         show_colnames = FALSE, show_rownames = TRUE, fontsize_row = 8, 
+	         legend = TRUE, legend_breaks = c(-2,0,2))
+
+pheatmap(Card9ind_hm_5, scale = "row", cluster_rows = FALSE, cluster_cols = FALSE, clustering_distance_rows = "correlation", 
+	         cutree_rows = 1, 
+	         cellwidth = 8, 
+	         cellheight = 10, 
+	         fontsize = 10, 
+	         show_colnames = FALSE, show_rownames = TRUE, fontsize_row = 8, 
+	         legend = TRUE, legend_breaks = c(-2,0,2))
+```
+
+### Card9-dependent 
+
+```{r}
+#Creating DF with only the expression values and with the gene names as the rownames
+Card9dep_hm <- Card9_dep_up
+Card9dep_hm$uGeneName <- make.names(Card9dep_hm$GeneName, unique=TRUE)
+rownames(Card9dep_hm) <- Card9dep_hm$uGeneName
+Card9dep_hm <- Card9dep_hm[, c(3:14)]
+
+#Generating gene lists of interest based on pathways
+geneset_dep_1 <- c("Nfkb1", "Nfkb2", "Relb", "Malt1")
+geneset_dep_2 <- c("Mapk8", "Map3k8", "Mapkapk2")
+geneset_dep_3 <- c("Il1b", "Il1a", "Il23", "Nlrp3")
+geneset_dep_4 <-c("Birc3", "Tnf", "Tnfaip3", "Traf1")
+
+#Generating df subsets
+Card9dep_hm_1 <- subset(Card9dep_hm, rownames(Card9dep_hm) %in% geneset_dep_1)
+Card9dep_hm_2 <- subset(Card9dep_hm, rownames(Card9dep_hm) %in% geneset_dep_2)
+Card9dep_hm_3 <- subset(Card9dep_hm, rownames(Card9dep_hm) %in% geneset_dep_3)
+Card9dep_hm_4 <- subset(Card9dep_hm, rownames(Card9dep_hm) %in% geneset_dep_4)
+
+#Generating hm
+pheatmap(Card9dep_hm_1, scale = "row", cluster_rows = FALSE, cluster_cols = FALSE, clustering_distance_rows = "correlation", 
+	         cutree_rows = 1, 
+	         cellwidth = 8, 
+	         cellheight = 10, 
+	         fontsize = 10, 
+	         show_colnames = FALSE, show_rownames = TRUE, fontsize_row = 8, 
+	         legend = TRUE, legend_breaks = c(-2,0,2))
+
+pheatmap(Card9dep_hm_2, scale = "row", cluster_rows = FALSE, cluster_cols = FALSE, clustering_distance_rows = "correlation", 
+	         cutree_rows = 1, 
+	         cellwidth = 8, 
+	         cellheight = 10, 
+	         fontsize = 10, 
+	         show_colnames = FALSE, show_rownames = TRUE, fontsize_row = 8, 
+	         legend = TRUE, legend_breaks = c(-2,0,2))
+
+
+pheatmap(Card9dep_hm_3, scale = "row", cluster_rows = FALSE, cluster_cols = FALSE, clustering_distance_rows = "correlation", 
+	         cutree_rows = 1, 
+	         cellwidth = 8, 
+	         cellheight = 10, 
+	         fontsize = 10, 
+	         show_colnames = FALSE, show_rownames = TRUE, fontsize_row = 8, 
+	         legend = TRUE, legend_breaks = c(-2,0,2))
+
+pheatmap(Card9dep_hm_4, scale = "row", cluster_rows = FALSE, cluster_cols = FALSE, clustering_distance_rows = "correlation", 
+	         cutree_rows = 1, 
+	         cellwidth = 8, 
+	         cellheight = 10, 
+	         fontsize = 10, 
+	         show_colnames = FALSE, show_rownames = TRUE, fontsize_row = 8, 
+	         legend = TRUE, legend_breaks = c(-2,0,2))
+```
+
+
+
+## SessionInfo
+
+```{r}
+sessionInfo()
+```
+
+
