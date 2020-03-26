@@ -330,6 +330,12 @@ length(Card9_ind_genelist)
 ## [1] 567
 ```
 
+```r
+#Save files
+save(Card9_dep, file = "Card9_dep.Rdata")
+save(Card9_ind, file = "Card9_ind.Rdata")
+```
+
 ## SessionInfo
 
 
