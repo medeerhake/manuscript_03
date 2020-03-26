@@ -228,6 +228,10 @@ Card9_ind <- subset(NormExp_Neutrophil_WTDE_intnonsig,
                     (NormExp_Neutrophil_WTDE_intnonsig[,"ratioFC"] > 0.7 ) | (NormExp_Neutrophil_WTDE_intnonsig[,"ratioFC"] > 1.3 ))
 Card9_ind_genelist <- as.list(Card9_ind$GeneName)
 length(Card9_ind_genelist)
+
+#Save files
+save(Card9_dep, file = "Card9_dep.Rdata")
+save(Card9_ind, file = "Card9_ind.Rdata")
 ```
 
 ## SessionInfo
