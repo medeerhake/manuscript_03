@@ -13,7 +13,9 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = FALSE, message = FAL
 
 ## Purpose
 
-The goal of this section is to predict which transcription factors may regulate Card9-dependent and Card9-independent Dectin-1 regulated genes. To do this, we are using ImmGen ATAC-seq data to identify open chromatin regions in our cell type of interest (BM neutrophils) and the predicted transcription factor (TF) binding sites in these open regions. This information is then used with a pathway enrichment analysis approach to identify those predicted TF sites that are overrepresented near genes of one group or the other. 
+PART3/4: The goal of these sections  is to predict which transcription factors may regulate Card9-dependent and Card9-independent Dectin-1 regulated genes. To do this, we are using ImmGen ATAC-seq data to identify open chromatin regions in our cell type of interest (BM neutrophils) and the predicted transcription factor (TF) binding sites in these open regions. This information is then used with a pathway enrichment analysis approach to identify those predicted TF sites that are overrepresented near genes of one group or the other. 
+
+In PART3, we are generating our reference of gene-TF pairs based on ImmGen ATAC-seq data. 
 
 ```{r library, results='hide'}
 library(devtools)

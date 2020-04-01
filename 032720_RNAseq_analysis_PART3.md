@@ -11,7 +11,9 @@ editor_options:
 
 ## Purpose
 
-The goal of this section is to predict which transcription factors may regulate Card9-dependent and Card9-independent Dectin-1 regulated genes. To do this, we are using ImmGen ATAC-seq data to identify open chromatin regions in our cell type of interest (BM neutrophils) and the predicted transcription factor (TF) binding sites in these open regions. This information is then used with a pathway enrichment analysis approach to identify those predicted TF sites that are overrepresented near genes of one group or the other. 
+PART3/4: The goal of these sections  is to predict which transcription factors may regulate Card9-dependent and Card9-independent Dectin-1 regulated genes. To do this, we are using ImmGen ATAC-seq data to identify open chromatin regions in our cell type of interest (BM neutrophils) and the predicted transcription factor (TF) binding sites in these open regions. This information is then used with a pathway enrichment analysis approach to identify those predicted TF sites that are overrepresented near genes of one group or the other. 
+
+In PART3, we are generating our reference of gene-TF pairs based on ImmGen ATAC-seq data. 
 
 
 ```r
@@ -132,7 +134,7 @@ end_time1 - start_time1
 ```
 
 ```
-## Time difference of 1.18684 mins
+## Time difference of 1.192573 mins
 ```
 
 ```r
@@ -172,7 +174,7 @@ end_time2 - start_time2
 ```
 
 ```
-## Time difference of 1.809073 hours
+## Time difference of 1.842473 hours
 ```
 
 Looking at features of and saving the compiled file
@@ -254,7 +256,7 @@ end_time3 - start_time3
 ```
 
 ```
-## Time difference of 29.90925 secs
+## Time difference of 30.26673 secs
 ```
 
 ## SessionInfo
