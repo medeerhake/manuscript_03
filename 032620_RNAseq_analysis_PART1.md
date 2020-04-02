@@ -27,8 +27,7 @@ Importing DESeq output data for WT and Card9 KO neutrophils +/- curdlan from exc
 
 
 ```r
-library(readxl)
-DifferentialExpression <- read_excel("DifferentialExpression.xlsx", 
+DifferentialExpression <- read_excel("SupplementaryTable_2.xlsx", 
     sheet = "CondCurdlan.GenotypeCard9mm")
 
 # Making a new df with just the neutrophil expression values and padj value for interaction term
@@ -42,7 +41,7 @@ Importing and merging in padj and FC values from WT neutrophil PBS vs. curdlan a
 
 
 ```r
-DifferentialExpression_WTNeut <- read_excel("DifferentialExpression.xlsx", 
+DifferentialExpression_WTNeut <- read_excel("SupplementaryTable_2.xlsx", 
     sheet = "WT-Neutrophil-curdlan.vs.PBS")
 #Making a  new df from this with just the gene name, padj, logfc
 WTNeut_stim_short <- DifferentialExpression_WTNeut[,c(2,4,8)]
@@ -52,7 +51,7 @@ colnames(WTNeut_stim_short)[colnames(WTNeut_stim_short)=="padj"] <- "padj_WTstim
 NormExp_Neutrophil_merged <- merge(NormExp_Neutrophil,WTNeut_stim_short, by="GeneName")
 
 
-DifferentialExpression_C9Neut <- read_excel("DifferentialExpression.xlsx", 
+DifferentialExpression_C9Neut <- read_excel("SupplementaryTable_2.xlsx", 
     sheet = "Card9-Neutrophil-curdlan.vs.PBS")
 #Making a  new df from this with just the gene name, padj, logfc
 C9Neut_stim_short <- DifferentialExpression_C9Neut[,c(2,4,8)]
@@ -323,6 +322,7 @@ length(Card9_dep_genelist)
 Card9_ind <- subset(NormExp_Neutrophil_WTDE_intnonsig, 
                     (NormExp_Neutrophil_WTDE_intnonsig[,"ratioFC"] > 0.7 ) | (NormExp_Neutrophil_WTDE_intnonsig[,"ratioFC"] > 1.3 ))
 Card9_ind_genelist <- as.list(Card9_ind$GeneName)
+
 length(Card9_ind_genelist)
 ```
 
@@ -333,7 +333,9 @@ length(Card9_ind_genelist)
 ```r
 #Save files
 save(Card9_dep, file = "Card9_dep.Rdata")
+write.csv(Card9_dep, file = "Card9_dep.csv")
 save(Card9_ind, file = "Card9_ind.Rdata")
+write.csv(Card9_ind, file = "Card9_ind.csv")
 ```
 
 ## SessionInfo
