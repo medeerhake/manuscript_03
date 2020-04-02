@@ -45,7 +45,7 @@ end_time1 - start_time1
 ```
 
 ```
-## Time difference of 19.61608 secs
+## Time difference of 19.97394 secs
 ```
 
 ```r
@@ -104,6 +104,17 @@ head(tbl_4_2)
 ## 6      Sp6 H60c
 ```
 
+```r
+#making list of TF genes with exp >50 in neut curdlan cond.
+DifferentialExpression_WTNeut <- read_excel("SupplementaryTable_2.xlsx", 
+    sheet = "WT-Neutrophil-curdlan.vs.PBS")
+Neut_exp_genes <- subset(DifferentialExpression_WTNeut, DifferentialExpression_WTNeut$WT.Neutrophil.curdlan.replicate.A > 50)
+Neut_exp_genes_list <- as.vector(Neut_exp_genes$GeneName)
+
+#subsetting category list based on this
+tbl_4_2 <- subset(tbl_4_2, tbl_4_2$Category %in% Neut_exp_genes_list)
+```
+
 ## 2. Loading Card9-independent and dependent gene information from PART1
 
 For Card9-independent and dependent genes, we are using both up and downregulated DE genes.
@@ -123,8 +134,6 @@ load(file = "Card9_ind.Rdata")
 de.genes <- Card9_dep$GeneName
 
 #I need a list of all of the genes now. Loading original differential expression data
-DifferentialExpression_WTNeut <- read_excel("DifferentialExpression.xlsx", 
-    sheet = "WT-Neutrophil-curdlan.vs.PBS")
 assayed.genes <- DifferentialExpression_WTNeut$GeneName
 
 #533 card9-dependent candidates, 14697 total genes in list
@@ -168,19 +177,19 @@ head(TEST_dep)
 
 ```
 ##     category over_represented_pvalue under_represented_pvalue numDEInCat
-## 242    Esrrg            5.888272e-14                        1        195
-## 240    Esrra            4.088432e-13                        1        172
-## 868      Rel            8.055955e-13                        1        195
-## 939  Smarcc1            9.856266e-13                        1        246
-## 737    Nr5a1            1.004064e-12                        1        174
-## 738    Nr5a2            1.004064e-12                        1        174
+## 68     Esrra            4.088432e-13                        1        172
+## 207      Rel            8.055955e-13                        1        195
+## 227  Smarcc1            9.856266e-13                        1        246
+## 208     Rela            1.715939e-12                        1        234
+## 216    Runx1            1.812044e-11                        1        290
+## 218    Runx3            1.812044e-11                        1        290
 ##     numInCat
-## 242     2979
-## 240     2555
-## 868     3057
-## 939     4199
-## 737     2623
-## 738     2623
+## 68      2555
+## 207     3057
+## 227     4199
+## 208     3944
+## 216     5359
+## 218     5359
 ```
 
 ```r
@@ -189,6 +198,15 @@ TEST_dep$padj_over <- p.adjust(TEST_dep$over_represented_pvalue, method="BH")
 
 #Subset based on adjusted p-values < 0.05
 TF_card9_dep <- subset(TEST_dep, TEST_dep[,"padj_over"]<0.05)
+#248 TFs
+dim(TF_card9_dep)
+```
+
+```
+## [1] 248   6
+```
+
+```r
 write.csv(TF_card9_dep, "TF_card9_dep.csv")
 ```
 
@@ -241,20 +259,20 @@ head(TEST_ind)
 ```
 
 ```
-##      category over_represented_pvalue under_represented_pvalue numDEInCat
-## 1053    Tcfe3            1.083824e-07                1.0000000        169
-## 271       Fos            3.646668e-07                1.0000000        184
-## 835    Pou5f1            3.924357e-07                1.0000000        116
-## 525      Jund            5.559170e-07                1.0000000        156
-## 659    Nfatc4            1.311522e-06                0.9999995        120
-## 658    Nfatc3            1.345489e-06                0.9999995        120
-##      numInCat
-## 1053     3131
-## 271      3532
-## 835      1961
-## 525      2901
-## 659      2094
-## 658      2095
+##     category over_represented_pvalue under_represented_pvalue numDEInCat
+## 75       Fos            3.646668e-07                1.0000000        184
+## 127     Jund            5.559170e-07                1.0000000        156
+## 169   Nfatc3            1.345489e-06                0.9999995        120
+## 157     Mitf            3.329868e-06                0.9999983        167
+## 144      Maf            5.541527e-06                0.9999970        120
+## 267     Usf1            1.573666e-05                0.9999903        164
+##     numInCat
+## 75      3532
+## 127     2901
+## 169     2095
+## 157     3214
+## 144     2138
+## 267     3213
 ```
 
 ```r
@@ -263,12 +281,12 @@ TEST_ind$padj_over <- p.adjust(TEST_ind$over_represented_pvalue, method="BH")
 
 #Subset based on adjusted p-values < 0.05
 TF_card9_ind <- subset(TEST_ind, TEST_ind[,"padj_over"]<0.05)
-#129 enriched TFs
+#71 enriched TFs
 dim(TF_card9_ind)
 ```
 
 ```
-## [1] 129   6
+## [1] 71  6
 ```
 
 ```r

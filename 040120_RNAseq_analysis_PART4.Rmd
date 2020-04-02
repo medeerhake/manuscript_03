@@ -58,6 +58,17 @@ tbl_4_1$gene <- tbl_4_1$Genes.within.100kb
 tbl_4_1 <- tbl_4_1[,c(3,4)]
 tbl_4_2 <- as.data.frame(tbl_4_1)
 head(tbl_4_2)
+
+#making list of TF genes with exp >50 in neut curdlan cond.
+DifferentialExpression_WTNeut <- read_excel("SupplementaryTable_2.xlsx", 
+    sheet = "WT-Neutrophil-curdlan.vs.PBS")
+Neut_exp_genes <- subset(DifferentialExpression_WTNeut, DifferentialExpression_WTNeut$WT.Neutrophil.curdlan.replicate.A > 50)
+Neut_exp_genes_list <- as.vector(Neut_exp_genes$GeneName)
+
+#subsetting category list based on this
+tbl_4_2 <- subset(tbl_4_2, tbl_4_2$Category %in% Neut_exp_genes_list)
+
+
 ```
 
 ## 2. Loading Card9-independent and dependent gene information from PART1
@@ -77,8 +88,6 @@ load(file = "Card9_ind.Rdata")
 de.genes <- Card9_dep$GeneName
 
 #I need a list of all of the genes now. Loading original differential expression data
-DifferentialExpression_WTNeut <- read_excel("DifferentialExpression.xlsx", 
-    sheet = "WT-Neutrophil-curdlan.vs.PBS")
 assayed.genes <- DifferentialExpression_WTNeut$GeneName
 
 #533 card9-dependent candidates, 14697 total genes in list
@@ -102,6 +111,8 @@ TEST_dep$padj_over <- p.adjust(TEST_dep$over_represented_pvalue, method="BH")
 
 #Subset based on adjusted p-values < 0.05
 TF_card9_dep <- subset(TEST_dep, TEST_dep[,"padj_over"]<0.05)
+#248 TFs
+dim(TF_card9_dep)
 write.csv(TF_card9_dep, "TF_card9_dep.csv")
 ```
 
@@ -134,7 +145,7 @@ TEST_ind$padj_over <- p.adjust(TEST_ind$over_represented_pvalue, method="BH")
 
 #Subset based on adjusted p-values < 0.05
 TF_card9_ind <- subset(TEST_ind, TEST_ind[,"padj_over"]<0.05)
-#129 enriched TFs
+#71 enriched TFs
 dim(TF_card9_ind)
 write.csv(TF_card9_ind, "TF_card9_ind.csv")
 ```
